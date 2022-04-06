@@ -1,5 +1,7 @@
-package com.github.coderodde.tsp;
+package com.github.coderodde.tsp.impl;
 
+import com.github.coderodde.tsp.AllPairsShortestPathData;
+import com.github.coderodde.tsp.Node;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

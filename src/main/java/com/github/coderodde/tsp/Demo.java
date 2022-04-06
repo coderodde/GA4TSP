@@ -1,10 +1,14 @@
 package com.github.coderodde.tsp;
 
-import com.github.coderodde.tsp.GeneticTSPSolver.Solution;
+import com.github.coderodde.tsp.AbstractGeneticTSPSolver.Solution;
+import com.github.coderodde.tsp.impl.GeneticTSPSolverV1;
 import java.util.List;
 
 public final class Demo {
 
+    private static final int NUMBER_OF_GENERATIONS = 10;
+    private static final int POPULATION_SIZE = 8;
+    
     public static void main(String[] args) {
         Node n1 = new Node("1");
         Node n2 = new Node("2");
@@ -31,17 +35,29 @@ public final class Demo {
         n6.addNeighbor(n4, 1.0);
         n6.addNeighbor(n5, 5.0);
         
-        Solution solution = GeneticTSPSolver.findTSPSolution(n3, 3);
-        AllPairsShortestPathData data = solution.data;
+        AbstractGeneticTSPSolver solver = new GeneticTSPSolverV1();
+        
+        long startTime = System.currentTimeMillis();
+        
+        Solution solution = 
+                solver.findTSPSolution(
+                        n6, 
+                        NUMBER_OF_GENERATIONS, 
+                        POPULATION_SIZE);
+        
+        long endTime = System.currentTimeMillis();
+        
+        AllPairsShortestPathData data = solution.getData();
         
         System.out.println("Tour:");
         
-        List<Node> tour = Utils.getExactTour(solution.tour, data);
+        List<Node> tour = Utils.getExactTour(solution.getTour(), data);
         
         for (Node node : tour) {
             System.out.println(node);
         }
         
-        System.out.println("\nCost: " + Utils.getTourCost(solution.tour, data));
+        System.out.println(
+                "\nCost: " + Utils.getTourCost(solution.getTour(), data));
     }
 }

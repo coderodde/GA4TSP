@@ -1,5 +1,6 @@
-package com.github.coderodde.tsp;
+package com.github.coderodde.tsp.impl;
 
+import com.github.coderodde.tsp.Node;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
