@@ -14,17 +14,13 @@ import javafx.stage.Stage;
 
 public final class Demo extends Application {
 
-    private static final int NUMBER_OF_GENERATIONS = 20;
-    private static final int POPULATION_SIZE = 10;
-    private static final int GRAPH_SIZE = 6;
+    private static final int NUMBER_OF_GENERATIONS = 50;
+    private static final int POPULATION_SIZE = 500;
+    private static final int GRAPH_SIZE = 10;
+    private static final int NUMBER_OF_EDGES = 30;
     
     public static void main(String[] args) {
         miniDemo(args);
-        uiDemo();
-    }
-    
-    private static void uiDemo() {
-        
     }
     
     private static void miniDemo(String[] args) {
@@ -101,8 +97,16 @@ public final class Demo extends Application {
         Canvas canvas = new Canvas(300, 300);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         
-        List<Node> nodeList = createNodeList(GRAPH_SIZE);
-        double[][] nodeCoordinates = getTourNodeCoordinates(nodeList);
+        List<Node> nodeList = createNodeList(GRAPH_SIZE, NUMBER_OF_EDGES);
+        
+        Solution solution = 
+                new GeneticTSPSolverV1()
+                        .findTSPSolution(
+                                nodeList.get(0), 
+                                NUMBER_OF_GENERATIONS, 
+                                POPULATION_SIZE);
+        
+        double[][] nodeCoordinates = getTourNodeCoordinates(solution.getTour());
         
         drawTour(gc, nodeCoordinates);
         
@@ -129,7 +133,7 @@ public final class Demo extends Application {
                 endY);
     }
     
-    private static List<Node> createNodeList(int graphSize) {
+    private static List<Node> createNodeList(int graphSize, int numberOfEdges) {
         Random random = new Random();
         List<Node> nodeList = new ArrayList<>(graphSize);
         
@@ -141,6 +145,12 @@ public final class Demo extends Application {
                             300.0 * random.nextDouble());
             
             nodeList.add(node);
+        }
+        
+        for (int edge = 0; edge < numberOfEdges; ++edge) {
+            Node node1 = nodeList.get(random.nextInt(nodeList.size()));
+            Node node2 = nodeList.get(random.nextInt(nodeList.size()));
+            node1.addNeighbor(node2);
         }
         
         return nodeList;
