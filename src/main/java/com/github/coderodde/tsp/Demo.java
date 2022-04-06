@@ -14,12 +14,12 @@ public final class Demo {
     }
     
     private static void miniDemo() {
-        Node n1 = new Node("1");
-        Node n2 = new Node("2");
-        Node n3 = new Node("3");
-        Node n4 = new Node("4");
-        Node n5 = new Node("5");
-        Node n6 = new Node("6");
+        Node n1 = new Node("1", 0.0, 10.0);
+        Node n2 = new Node("2", 5.5, 8.5);
+        Node n3 = new Node("3", 2.3, 6.7);
+        Node n4 = new Node("4", 2.8, 5.0);
+        Node n5 = new Node("5", 4.1, 7.2);
+        Node n6 = new Node("6", 1.0, 5.8);
         
         /*
         Graph:
@@ -32,12 +32,12 @@ public final class Demo {
         
         */
         
-        n1.addNeighbor(n3, 1.0);
-        n2.addNeighbor(n3, 2.0);
-        n3.addNeighbor(n4, 3.0);
-        n3.addNeighbor(n5, 4.0);
-        n6.addNeighbor(n4, 1.0);
-        n6.addNeighbor(n5, 5.0);
+        n1.addNeighbor(n3);
+        n2.addNeighbor(n3);
+        n3.addNeighbor(n4);
+        n3.addNeighbor(n5);
+        n6.addNeighbor(n4);
+        n6.addNeighbor(n5);
         
         AbstractGeneticTSPSolver solver = new GeneticTSPSolverV1();
         
@@ -65,5 +65,16 @@ public final class Demo {
         
         System.out.println(
                 "\nCost: " + Utils.getTourCost(solution.getTour(), data));
+        
+        System.out.println("Data:");
+        
+        for (Node node : solution.getTour()) {
+            System.out.println(
+                    node.toString() 
+                            + ", x = " 
+                            + node.getX() 
+                            + ", y = " 
+                            + node.getY());
+        }
     }
 }

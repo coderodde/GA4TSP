@@ -17,11 +17,20 @@ public final class Node {
     private final String name;
     private final Map<Node, Double> neighborMap = new HashMap<>();
     
-    public Node(String name) {
+    private final double x;
+    private final double y;
+    
+    public Node(String name, double x, double y) {
         this.name = Objects.requireNonNull(name, "The node name is null.");
+        this.x = x;
+        this.y = y;
     }
     
-    public void addNeighbor(Node node, double weight) {
+    public void addNeighbor(Node node) {
+        double dx = x - node.x;
+        double dy = y - node.y;
+        double weight = Math.sqrt(dx * dx + dy * dy);
+        
         neighborMap.put(node, weight);
         node.neighborMap.put(this, weight);
     }
@@ -32,6 +41,14 @@ public final class Node {
     
     public Collection<Node> getNeighbors() {
         return neighborMap.keySet();
+    }
+    
+    public double getX() {
+        return x;
+    }
+    
+    public double getY() {
+        return y;
     }
     
     @Override
