@@ -115,7 +115,7 @@ public final class GeneticTSPSolverV1 extends AbstractGeneticTSPSolver {
         for (int i = 0; i < gene1Length; ++i) {
             Node node = parents[0].get(i);
             nodeSet.add(node);
-            genes1.add(node);
+            genes1.add(node); 
         }
         
         int index = 0;
