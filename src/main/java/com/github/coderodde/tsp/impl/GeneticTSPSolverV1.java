@@ -44,7 +44,7 @@ public final class GeneticTSPSolverV1 extends AbstractGeneticTSPSolver {
         
         checkGraphSize(reachableNodes.size());
         
-        Random random = new Random(1);
+        Random random = new Random();
         AllPairsShortestPathData allPairsData = 
                 AllPairsShortestPathSolver.solve(reachableNodes);
         

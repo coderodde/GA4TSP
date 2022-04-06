@@ -2,6 +2,7 @@ com\github\coderodde\tsp\impl\ProbabilityDistribution$Entry.class
 com\github\coderodde\tsp\AbstractGeneticTSPSolver.class
 com\github\coderodde\tsp\impl\GraphExpander.class
 com\github\coderodde\tsp\impl\ProbabilityDistribution.class
+com\github\coderodde\tsp\ui\TSPWindow.class
 com\github\coderodde\tsp\AbstractGeneticTSPSolver$Solution.class
 com\github\coderodde\tsp\impl\GeneticTSPSolverV1.class
 com\github\coderodde\tsp\Node.class

@@ -2,18 +2,32 @@ package com.github.coderodde.tsp;
 
 import com.github.coderodde.tsp.AbstractGeneticTSPSolver.Solution;
 import com.github.coderodde.tsp.impl.GeneticTSPSolverV1;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import javafx.application.Application;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.stage.Stage;
 
-public final class Demo {
+public final class Demo extends Application {
 
     private static final int NUMBER_OF_GENERATIONS = 20;
     private static final int POPULATION_SIZE = 10;
+    private static final int GRAPH_SIZE = 6;
     
     public static void main(String[] args) {
-        miniDemo();
+        miniDemo(args);
+        uiDemo();
     }
     
-    private static void miniDemo() {
+    private static void uiDemo() {
+        
+    }
+    
+    private static void miniDemo(String[] args) {
         Node n1 = new Node("1", 0.0, 10.0);
         Node n2 = new Node("2", 5.5, 8.5);
         Node n3 = new Node("3", 2.3, 6.7);
@@ -76,5 +90,72 @@ public final class Demo {
                             + ", y = " 
                             + node.getY());
         }
+        
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        primaryStage.setTitle("GA4TSP");
+        Group root = new Group();
+        Canvas canvas = new Canvas(300, 300);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        
+        List<Node> nodeList = createNodeList(GRAPH_SIZE);
+        double[][] nodeCoordinates = getTourNodeCoordinates(nodeList);
+        
+        drawTour(gc, nodeCoordinates);
+        
+        root.getChildren().add(canvas);
+        primaryStage.setScene(new Scene(root));
+        primaryStage.show();
+    }
+    
+    private static void drawTour(GraphicsContext gc,
+                                 double[][] nodeCoordinates) {
+        
+        gc.strokePolyline(nodeCoordinates[0], 
+                          nodeCoordinates[1], 
+                          nodeCoordinates[0].length);
+        
+        // Finish the tour:
+        double endX = nodeCoordinates[0][nodeCoordinates[0].length - 1];
+        double endY = nodeCoordinates[1][nodeCoordinates[1].length - 1];
+        
+        gc.strokeLine(
+                nodeCoordinates[0][0], 
+                nodeCoordinates[1][0],
+                endX,
+                endY);
+    }
+    
+    private static List<Node> createNodeList(int graphSize) {
+        Random random = new Random();
+        List<Node> nodeList = new ArrayList<>(graphSize);
+        
+        for (int i = 0; i < graphSize; ++i) {
+            Node node = 
+                    new Node(
+                            "" + i, 
+                            300.0 * random.nextDouble(), 
+                            300.0 * random.nextDouble());
+            
+            nodeList.add(node);
+        }
+        
+        return nodeList;
+    }
+    
+    private static double[][] getTourNodeCoordinates(List<Node> nodeList) {
+        double[][] coordinateArray = new double[2][nodeList.size()];
+        int index = 0;
+        
+        for (Node node : nodeList) {
+            coordinateArray[0][index] = node.getX();
+            coordinateArray[1][index] = node.getY();
+            index++;
+        }
+        
+        return coordinateArray;
     }
 }
