@@ -73,8 +73,9 @@ final class ProbabilityDistribution<E> {
  
             value -= currentWeight;
         }
- 
-        throw new IllegalStateException("Should not get here.");
+        
+        // Should not happen often:
+        return storage.get(random.nextInt(storage.size())).element;
     }
  
     public boolean removeElement(E element) {

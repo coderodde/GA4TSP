@@ -14,7 +14,7 @@ import java.util.Map;
  * @version 1.6 (Mar 29, 2022)
  * @since 1.6 (Mar 29, 2022)
  */
-public final class AllPairsShortestPathSolver {
+final class AllPairsShortestPathSolver {
 
     public static AllPairsShortestPathData solve(List<Node> graph) {
         Map<Node, Map<Node, Double>> costMatrix = new HashMap<>(graph.size());

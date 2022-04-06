@@ -6,10 +6,14 @@ import java.util.List;
 
 public final class Demo {
 
-    private static final int NUMBER_OF_GENERATIONS = 10;
-    private static final int POPULATION_SIZE = 8;
+    private static final int NUMBER_OF_GENERATIONS = 20;
+    private static final int POPULATION_SIZE = 10;
     
     public static void main(String[] args) {
+        miniDemo();
+    }
+    
+    private static void miniDemo() {
         Node n1 = new Node("1");
         Node n2 = new Node("2");
         Node n3 = new Node("3");
@@ -46,6 +50,8 @@ public final class Demo {
                         POPULATION_SIZE);
         
         long endTime = System.currentTimeMillis();
+        
+        System.out.println("Duration: " + (endTime - startTime) + " ms.");
         
         AllPairsShortestPathData data = solution.getData();
         

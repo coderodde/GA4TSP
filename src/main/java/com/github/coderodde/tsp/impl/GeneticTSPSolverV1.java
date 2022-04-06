@@ -21,9 +21,6 @@ import java.util.Set;
  */
 public final class GeneticTSPSolverV1 extends AbstractGeneticTSPSolver {
     
-    // The minimum number of graph vertices expected.
-    private static final int MINIMUM_GRAPH_SIZE = 4;
-    
     /**
      * Returns an (approximate) solution to the TSP problem via genetic 
      * algorithm.
@@ -47,7 +44,7 @@ public final class GeneticTSPSolverV1 extends AbstractGeneticTSPSolver {
         
         checkGraphSize(reachableNodes.size());
         
-        Random random = new Random();
+        Random random = new Random(1);
         AllPairsShortestPathData allPairsData = 
                 AllPairsShortestPathSolver.solve(reachableNodes);
         
@@ -86,19 +83,6 @@ public final class GeneticTSPSolverV1 extends AbstractGeneticTSPSolver {
         return fittestTour;
     }
     
-    private static void shuffle(int[] arr, Random random) {
-        for (int i = arr.length - 1; i > 0; --i) {
-            int j = random.nextInt(i + 1);
-            swap(arr, i, j);
-        }
-    }
-    
-    private static void swap(int[] arr, int index1, int index2) {
-        int tmp = arr[index1];
-        arr[index1] = arr[index2];
-        arr[index2] = tmp;
-    }
-    
     private static List<List<Node>> 
         evolvePopulation(List<List<Node>> population,
                          AllPairsShortestPathData data,
@@ -115,10 +99,12 @@ public final class GeneticTSPSolverV1 extends AbstractGeneticTSPSolver {
     }
         
     private static List<Node> breedTour(List<Node>[] parents, Random random) {
-        int totalGeneLength = parents[0].size() / 3;
+        
+        int tourLength = parents[0].size();
+        int totalGeneLength = tourLength / NUMBER_OF_PARENTS;
         int gene1Length = totalGeneLength;
         int gene2Length = totalGeneLength;
-        int gene3Length = totalGeneLength + totalGeneLength % 3;
+        int gene3Length = tourLength - gene1Length - gene2Length;
         
         List<Node> tour = new ArrayList<>(totalGeneLength);
         List<Node> genes1 = new ArrayList<>(gene1Length);
@@ -128,30 +114,29 @@ public final class GeneticTSPSolverV1 extends AbstractGeneticTSPSolver {
         
         for (int i = 0; i < gene1Length; ++i) {
             Node node = parents[0].get(i);
+            nodeSet.add(node);
             genes1.add(node);
         }
         
         int index = 0;
         
         while (genes2.size() < gene2Length) {
-            Node node = parents[1].get(index);
+            Node node = parents[1].get(index++);
             
             if (!nodeSet.contains(node)) {
                 nodeSet.add(node);
                 genes2.add(node);
-                ++index;
             }
         }
         
         index = 0;
         
         while (genes3.size() < gene3Length) {
-            Node node = parents[2].get(index);
+            Node node = parents[2].get(index++);
             
             if (!nodeSet.contains(node)) {
                 nodeSet.add(node);
                 genes3.add(node);
-                ++index;
             }
         }
         
@@ -172,12 +157,12 @@ public final class GeneticTSPSolverV1 extends AbstractGeneticTSPSolver {
         
     private static double getMaximumTourCost(List<List<Node>> population,
                                              AllPairsShortestPathData data) {
-        double fittestTourCost = Double.MAX_VALUE;
+        double fittestTourCost = -1.0;
         
         for (List<Node> tour : population) {
             double tentativeTourCost = Utils.getTourCost(tour, data);
             
-            if (fittestTourCost > tentativeTourCost) {
+            if (fittestTourCost < tentativeTourCost) {
                 fittestTourCost = tentativeTourCost;
             }
         }
@@ -203,7 +188,7 @@ public final class GeneticTSPSolverV1 extends AbstractGeneticTSPSolver {
         Set<List<Node>> parentFilter = new HashSet<>();
         int index = 0;
         
-        while (parentFilter.size() < 3) {
+        while (parentFilter.size() < NUMBER_OF_PARENTS) {
             List<Node> parent = distribution.sampleElement();
             
             if (!parentFilter.contains(parent)) {
