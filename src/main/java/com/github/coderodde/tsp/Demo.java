@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 
 public final class Demo extends Application {
@@ -27,11 +28,6 @@ public final class Demo extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("GA4TSP");
-        Group root = new Group();
-        Canvas canvas = new Canvas(300.0, 300.0);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        
         List<Node> nodeList = createNodeList(GRAPH_SIZE, NUMBER_OF_EDGES);
         
         long startTime = System.currentTimeMillis();
@@ -84,58 +80,58 @@ public final class Demo extends Application {
         double[][] nodeCoordinates2 = 
                 getTourNodeCoordinates(solution2.getTour());
         
-        drawTour(gc, nodeCoordinates1, nodeCoordinates2);
+        primaryStage.setTitle("GA4TSP - GA tour");
+        Group root = new Group();
+        Canvas canvas = new Canvas(300.0, 300.0);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        
+        gc.setLineWidth(4.0);
+        gc.setStroke(Color.DARKBLUE);
+        
+        drawTour(gc, nodeCoordinates1);
         
         root.getChildren().add(canvas);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+        
+        Stage bfStage = new Stage();
+        bfStage.setTitle("GA4TSP - BF tour");
+        Group bfRoot = new Group();
+        Canvas bfCanvas = new Canvas(300.0, 300.0);
+        GraphicsContext bfGC = bfCanvas.getGraphicsContext2D();
+        bfGC.setLineWidth(4.0);
+        bfGC.setStroke(Color.DARKRED);
+        drawTour(bfGC, nodeCoordinates2);
+        bfRoot.getChildren().add(bfCanvas);
+        bfStage.setScene(new Scene(bfRoot));
+        bfStage.show();
     }
     
     private static void drawTour(GraphicsContext gc,
-                                 double[][] nodeCoordinates1, // approximated.
-                                 double[][] nodeCoordinates2) {
+                                 double[][] nodeCoordinates) {
         
-        gc.setStroke(Color.DARKRED);
-        gc.setLineWidth(6.0);
-        
-        gc.strokePolyline(nodeCoordinates1[0], 
-                          nodeCoordinates1[1], 
-                          nodeCoordinates1[0].length);
+        gc.strokePolyline(nodeCoordinates[0], 
+                          nodeCoordinates[1], 
+                          nodeCoordinates[0].length);
         
         // Finish the tour:
-        double endX = nodeCoordinates1[0][nodeCoordinates1[0].length - 1];
-        double endY = nodeCoordinates1[1][nodeCoordinates1[1].length - 1];
+        double endX = nodeCoordinates[0][nodeCoordinates[0].length - 1];
+        double endY = nodeCoordinates[1][nodeCoordinates[1].length - 1];
         
         gc.strokeLine(
-                nodeCoordinates1[0][0], 
-                nodeCoordinates1[1][0],
-                endX,
-                endY);
-        
-        gc.setLineWidth(3.0);
-        gc.setStroke(Color.BLUE);
-        
-        gc.strokePolyline(nodeCoordinates2[0], 
-                          nodeCoordinates2[1], 
-                          nodeCoordinates2[0].length);
-        
-        // Finish the tour:
-        endX = nodeCoordinates2[0][nodeCoordinates2[0].length - 1];
-        endY = nodeCoordinates2[1][nodeCoordinates2[1].length - 1];
-        
-        gc.strokeLine(
-                nodeCoordinates2[0][0], 
-                nodeCoordinates2[1][0],
+                nodeCoordinates[0][0], 
+                nodeCoordinates[1][0],
                 endX,
                 endY);
         
         for (int nodeIndex = 0; 
-                nodeIndex < nodeCoordinates1[0].length; 
+                nodeIndex < nodeCoordinates[0].length; 
                 nodeIndex++) {
-            double x = nodeCoordinates1[0][nodeIndex];
-            double y = nodeCoordinates1[1][nodeIndex];
             
-            gc.fillRect(x - 2.0, y - 2.0, 4.0, 4.0);
+            double x = nodeCoordinates[0][nodeIndex];
+            double y = nodeCoordinates[1][nodeIndex];
+            
+            gc.fillOval(x - 3.5, y - 3.5, 7.0, 7.0);
         }
     }
     
