@@ -1,11 +1,11 @@
 package com.github.coderodde.tsp.impl;
 
-import com.github.coderodde.tsp.AbstractTSPSolver;
 import com.github.coderodde.tsp.AllPairsShortestPathData;
 import com.github.coderodde.tsp.Node;
 import com.github.coderodde.tsp.Utils;
 import java.util.List;
 import java.util.Objects;
+import com.github.coderodde.tsp.TSPSolver;
 
 /**
  * This class provides a method for solving the Travelling salesman problem via
@@ -16,17 +16,14 @@ import java.util.Objects;
  * @version 1.6 (Apr 7, 2022)
  * @since 1.6 (Apr 7, 2022)
  */
-public final class BruteForceTSPSolver extends AbstractTSPSolver {
+public final class BruteForceTSPSolver implements TSPSolver {
+    
+    private static final int MINIMUM_GRAPH_SIZE = 2;
     
     @Override
-    public Solution findTSPSolution(Node seedNode, 
-                                    int generations,
-                                    int populationSize) {
+    public Solution findTSPSolution(Node seedNode) {
         
         Objects.requireNonNull(seedNode, "The seed node is null.");
-        
-        checkNumberOfGenerations(generations);
-        checkPopulationSize(populationSize);
         
         List<Node> reachableNodes =
                 GraphExpander.computeReachableNodesFrom(seedNode);
@@ -51,5 +48,16 @@ public final class BruteForceTSPSolver extends AbstractTSPSolver {
         }
         
         return new Solution(bestTour, allPairsData);
+    }
+    
+    private static void checkGraphSize(int numberOfNodes) {
+        if (numberOfNodes < 2) {
+            throw new IllegalArgumentException(
+                    "Too little graph nodes: " 
+                            + numberOfNodes 
+                            + ". Must be at least " 
+                            + MINIMUM_GRAPH_SIZE
+                            + ".");
+        }
     }
 }

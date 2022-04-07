@@ -1,6 +1,7 @@
 package com.github.coderodde.tsp;
 
-import com.github.coderodde.tsp.AbstractTSPSolver.Solution;
+import com.github.coderodde.tsp.TSPSolver.Solution;
+import com.github.coderodde.tsp.impl.BruteForceTSPSolver;
 import com.github.coderodde.tsp.impl.GeneticTSPSolverV1;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,83 +11,17 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public final class Demo extends Application {
 
     private static final int NUMBER_OF_GENERATIONS = 50;
     private static final int POPULATION_SIZE = 500;
-    private static final int GRAPH_SIZE = 10;
+    private static final int GRAPH_SIZE = 11;
     private static final int NUMBER_OF_EDGES = 50;
     
     public static void main(String[] args) {
-        miniDemo(args);
-    }
-    
-    private static void miniDemo(String[] args) {
-        Node n1 = new Node("1", 0.0, 10.0);
-        Node n2 = new Node("2", 5.5, 8.5);
-        Node n3 = new Node("3", 2.3, 6.7);
-        Node n4 = new Node("4", 2.8, 5.0);
-        Node n5 = new Node("5", 4.1, 7.2);
-        Node n6 = new Node("6", 1.0, 5.8);
-        
-        /*
-        Graph:
-        
-        n1    n4
-          \  /  \
-           n3    n6
-          /  \  /
-        n2    n5
-        
-        */
-        
-        n1.addNeighbor(n3);
-        n2.addNeighbor(n3);
-        n3.addNeighbor(n4);
-        n3.addNeighbor(n5);
-        n6.addNeighbor(n4);
-        n6.addNeighbor(n5);
-        
-        AbstractTSPSolver solver = new GeneticTSPSolverV1();
-        
-        long startTime = System.currentTimeMillis();
-        
-        Solution solution = 
-                solver.findTSPSolution(
-                        n6, 
-                        NUMBER_OF_GENERATIONS, 
-                        POPULATION_SIZE);
-        
-        long endTime = System.currentTimeMillis();
-        
-        System.out.println("Duration: " + (endTime - startTime) + " ms.");
-        
-        AllPairsShortestPathData data = solution.getData();
-        
-        System.out.println("Tour:");
-        
-        List<Node> tour = Utils.getExactTour(solution.getTour(), data);
-        
-        for (Node node : tour) {
-            System.out.println(node);
-        }
-        
-        System.out.println(
-                "\nCost: " + Utils.getTourCost(solution.getTour(), data));
-        
-        System.out.println("Data:");
-        
-        for (Node node : solution.getTour()) {
-            System.out.println(
-                    node.toString() 
-                            + ", x = " 
-                            + node.getX() 
-                            + ", y = " 
-                            + node.getY());
-        }
-        
         launch(args);
     }
 
@@ -94,21 +29,62 @@ public final class Demo extends Application {
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("GA4TSP");
         Group root = new Group();
-        Canvas canvas = new Canvas(300, 300);
+        Canvas canvas = new Canvas(300.0, 300.0);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         
         List<Node> nodeList = createNodeList(GRAPH_SIZE, NUMBER_OF_EDGES);
         
-        Solution solution = 
-                new GeneticTSPSolverV1()
+        long startTime = System.currentTimeMillis();
+        
+        // solution1 - approximated.
+        Solution solution1 = 
+                new GeneticTSPSolverV1(NUMBER_OF_GENERATIONS,
+                                       POPULATION_SIZE)
                         .findTSPSolution(
-                                nodeList.get(0), 
-                                NUMBER_OF_GENERATIONS, 
-                                POPULATION_SIZE);
+                                nodeList.get(0));
         
-        double[][] nodeCoordinates = getTourNodeCoordinates(solution.getTour());
+        long endTime = System.currentTimeMillis();
+        System.out.println(
+                "GA duration: " + (endTime - startTime) + " ms.");
         
-        drawTour(gc, nodeCoordinates);
+        // solution2 - optimal.
+        startTime = System.currentTimeMillis();
+        
+        Solution solution2 = 
+                new BruteForceTSPSolver().findTSPSolution(nodeList.get(0));
+        
+        endTime = System.currentTimeMillis();
+        System.out.println(
+                "Brute-force duration: " + (endTime - startTime) + " ms.");
+        
+        System.out.println("---");
+        double costApproximated;
+        double costBruteForced;
+        
+        System.out.println(
+                "GA cost: " 
+                        + (costApproximated = Utils.getTourCost(
+                                solution1.getTour(),
+                                solution1.getData())));
+        
+        System.out.println(
+                "Brute-force cost: " 
+                        + (costBruteForced = Utils.getTourCost(
+                                solution2.getTour(),
+                                solution2.getData())));
+        
+        System.out.println(
+                "Cost ratio: " + (costApproximated / costBruteForced));
+        
+        // approximated.
+        double[][] nodeCoordinates1 = 
+                getTourNodeCoordinates(solution1.getTour());
+        
+        // optimal.
+        double[][] nodeCoordinates2 = 
+                getTourNodeCoordinates(solution2.getTour());
+        
+        drawTour(gc, nodeCoordinates1, nodeCoordinates2);
         
         root.getChildren().add(canvas);
         primaryStage.setScene(new Scene(root));
@@ -116,21 +92,51 @@ public final class Demo extends Application {
     }
     
     private static void drawTour(GraphicsContext gc,
-                                 double[][] nodeCoordinates) {
+                                 double[][] nodeCoordinates1, // approximated.
+                                 double[][] nodeCoordinates2) {
         
-        gc.strokePolyline(nodeCoordinates[0], 
-                          nodeCoordinates[1], 
-                          nodeCoordinates[0].length);
+        gc.setStroke(Color.DARKRED);
+        gc.setLineWidth(6.0);
+        
+        gc.strokePolyline(nodeCoordinates1[0], 
+                          nodeCoordinates1[1], 
+                          nodeCoordinates1[0].length);
         
         // Finish the tour:
-        double endX = nodeCoordinates[0][nodeCoordinates[0].length - 1];
-        double endY = nodeCoordinates[1][nodeCoordinates[1].length - 1];
+        double endX = nodeCoordinates1[0][nodeCoordinates1[0].length - 1];
+        double endY = nodeCoordinates1[1][nodeCoordinates1[1].length - 1];
         
         gc.strokeLine(
-                nodeCoordinates[0][0], 
-                nodeCoordinates[1][0],
+                nodeCoordinates1[0][0], 
+                nodeCoordinates1[1][0],
                 endX,
                 endY);
+        
+        gc.setLineWidth(3.0);
+        gc.setStroke(Color.BLUE);
+        
+        gc.strokePolyline(nodeCoordinates2[0], 
+                          nodeCoordinates2[1], 
+                          nodeCoordinates2[0].length);
+        
+        // Finish the tour:
+        endX = nodeCoordinates2[0][nodeCoordinates2[0].length - 1];
+        endY = nodeCoordinates2[1][nodeCoordinates2[1].length - 1];
+        
+        gc.strokeLine(
+                nodeCoordinates2[0][0], 
+                nodeCoordinates2[1][0],
+                endX,
+                endY);
+        
+        for (int nodeIndex = 0; 
+                nodeIndex < nodeCoordinates1[0].length; 
+                nodeIndex++) {
+            double x = nodeCoordinates1[0][nodeIndex];
+            double y = nodeCoordinates1[1][nodeIndex];
+            
+            gc.fillRect(x - 2.0, y - 2.0, 4.0, 4.0);
+        }
     }
     
     private static List<Node> createNodeList(int graphSize, int numberOfEdges) {

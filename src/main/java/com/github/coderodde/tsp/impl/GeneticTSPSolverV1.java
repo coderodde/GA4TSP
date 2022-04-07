@@ -1,6 +1,5 @@
 package com.github.coderodde.tsp.impl;
 
-import com.github.coderodde.tsp.AbstractTSPSolver;
 import com.github.coderodde.tsp.AllPairsShortestPathData;
 import com.github.coderodde.tsp.Node;
 import com.github.coderodde.tsp.Utils;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
+import com.github.coderodde.tsp.TSPSolver;
 
 /**
  * This class implements the genetic (unoptimized) TSP solver.
@@ -19,25 +19,59 @@ import java.util.Set;
  * @version 1.6 (Mar 29, 2022)
  * @since 1.6 (Mar 29, 2022)
  */
-public final class GeneticTSPSolverV1 extends AbstractTSPSolver {
+public final class GeneticTSPSolverV1 implements TSPSolver {
+    
+    // The number of parents of each individual (tour). This is trisexual.
+    protected static final int NUMBER_OF_PARENTS = 3;
+    
+    // The minimum number of generations. If 1 is passed, only a randomly 
+    // (initial) generation will be returned.
+    private static final int MINIMUM_NUMBER_OF_GENERATIONS = 1;
+    
+    // The minimum population size.
+    private static final int MINIMUM_POPULATION_SIZE = 5;
+    
+    // The minimum number of vertices in the input graph. We need this in order
+    // to make sure that we have sufficient amount of individuals in each 
+    // generation.
+    private static final int MINIMUM_GRAPH_SIZE = 4;
+    
+    private static final int DEFAULT_NUMBER_OF_GENERATIONS = 10;
+    private static final int DEFAULT_POPULATION_SIZE = 10;
+    
+    private final int numberOfGenerations;
+    private final int populationSize;
+    
+    /**
+     * Constructs a genetic solver with given parameters.
+     * 
+     * @param numberOfGenerations the number of generations.
+     * @param populationSize      the population size at each generation.
+     */
+    public GeneticTSPSolverV1(int numberOfGenerations,
+                              int populationSize) {
+        
+        checkNumberOfGenerations(numberOfGenerations);
+        checkPopulationSize(populationSize);
+        
+        this.numberOfGenerations = numberOfGenerations;
+        this.populationSize = populationSize;
+    }
+    
+    public GeneticTSPSolverV1() {
+        this(DEFAULT_NUMBER_OF_GENERATIONS,
+             DEFAULT_POPULATION_SIZE);
+    }
     
     /**
      * Returns an (approximate) solution to the TSP problem via genetic 
      * algorithm.
      * 
-     * @param seedNode       the seed node of the graph.
-     * @param generations    the number of generations.
-     * @param populationSize the population size at each generation.
+     * @param seedNode the seed node of the graph.
      * @return an approximate solution to the TSP problem instance.
      */
-    public Solution findTSPSolution(Node seedNode, 
-                                    int generations,
-                                    int populationSize) {
-        
+    public Solution findTSPSolution(Node seedNode) {
         Objects.requireNonNull(seedNode, "The seed node is null.");
-        
-        checkNumberOfGenerations(generations);
-        checkPopulationSize(populationSize);
         
         List<Node> reachableNodes =
                 GraphExpander.computeReachableNodesFrom(seedNode);
@@ -53,7 +87,7 @@ public final class GeneticTSPSolverV1 extends AbstractTSPSolver {
                                          populationSize, 
                                          random);
         for (int generationNumber = 1;
-                generationNumber < generations; 
+                generationNumber < numberOfGenerations; 
                 generationNumber++) {
                 
             List<List<Node>> nextPopulation = 
@@ -140,7 +174,7 @@ public final class GeneticTSPSolverV1 extends AbstractTSPSolver {
             }
         }
         
-        List<List<Node>> genes = new ArrayList<>(3);
+        List<List<Node>> genes = new ArrayList<>(NUMBER_OF_PARENTS);
         
         genes.add(genes1);
         genes.add(genes2);
@@ -184,7 +218,7 @@ public final class GeneticTSPSolverV1 extends AbstractTSPSolver {
             distribution.addElement(tour, tourWeight);
         }
         
-        List<Node>[] parents = new List[3];
+        List<Node>[] parents = new List[NUMBER_OF_PARENTS];
         Set<List<Node>> parentFilter = new HashSet<>();
         int index = 0;
         
@@ -215,5 +249,38 @@ public final class GeneticTSPSolverV1 extends AbstractTSPSolver {
         
         return initialGeneration;
     }
-                
+     
+    protected static void checkNumberOfGenerations(int numberOfGenerations) {
+        if (numberOfGenerations < MINIMUM_NUMBER_OF_GENERATIONS) {
+            throw new IllegalArgumentException(
+                    "Number of generations is too small: " 
+                            + numberOfGenerations 
+                            + ". Must be at least " 
+                            + MINIMUM_NUMBER_OF_GENERATIONS 
+                            + ".");
+        }
+    }
+               
+    protected static void checkPopulationSize(int populationSize) {
+        if (populationSize < MINIMUM_POPULATION_SIZE) {
+            throw new IllegalArgumentException(
+                    "Population size is too small: " 
+                            + populationSize 
+                            + ". Must be at least " 
+                            + MINIMUM_POPULATION_SIZE 
+                            + ".");
+        }
+    }
+    
+    protected static void checkGraphSize(int graphSize) {
+        if (graphSize < MINIMUM_GRAPH_SIZE) {
+            throw new IllegalArgumentException(
+                    "The graph size is " 
+                            + graphSize
+                            + ". Minimum allowed size is " 
+                            + MINIMUM_GRAPH_SIZE
+                            + "."
+            );
+        }
+    }           
 }
