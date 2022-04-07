@@ -1,6 +1,6 @@
 package com.github.coderodde.tsp;
 
-import com.github.coderodde.tsp.AbstractGeneticTSPSolver.Solution;
+import com.github.coderodde.tsp.AbstractTSPSolver.Solution;
 import com.github.coderodde.tsp.impl.GeneticTSPSolverV1;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public final class Demo extends Application {
     private static final int NUMBER_OF_GENERATIONS = 50;
     private static final int POPULATION_SIZE = 500;
     private static final int GRAPH_SIZE = 10;
-    private static final int NUMBER_OF_EDGES = 30;
+    private static final int NUMBER_OF_EDGES = 50;
     
     public static void main(String[] args) {
         miniDemo(args);
@@ -49,7 +49,7 @@ public final class Demo extends Application {
         n6.addNeighbor(n4);
         n6.addNeighbor(n5);
         
-        AbstractGeneticTSPSolver solver = new GeneticTSPSolverV1();
+        AbstractTSPSolver solver = new GeneticTSPSolverV1();
         
         long startTime = System.currentTimeMillis();
         

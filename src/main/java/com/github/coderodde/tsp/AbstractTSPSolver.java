@@ -13,7 +13,7 @@ import java.util.Objects;
  * @version 1.6 (Apr 6, 2022)
  * @since 1.6 (Apr 6, 2022)
  */
-public abstract class AbstractGeneticTSPSolver {
+public abstract class AbstractTSPSolver {
     
     // The minimum number of generations. If 1 is passed, only a randomly 
     // (initial) generation will be returned.

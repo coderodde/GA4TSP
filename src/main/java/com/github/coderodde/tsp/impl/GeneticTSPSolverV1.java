@@ -1,6 +1,6 @@
 package com.github.coderodde.tsp.impl;
 
-import com.github.coderodde.tsp.AbstractGeneticTSPSolver;
+import com.github.coderodde.tsp.AbstractTSPSolver;
 import com.github.coderodde.tsp.AllPairsShortestPathData;
 import com.github.coderodde.tsp.Node;
 import com.github.coderodde.tsp.Utils;
@@ -19,7 +19,7 @@ import java.util.Set;
  * @version 1.6 (Mar 29, 2022)
  * @since 1.6 (Mar 29, 2022)
  */
-public final class GeneticTSPSolverV1 extends AbstractGeneticTSPSolver {
+public final class GeneticTSPSolverV1 extends AbstractTSPSolver {
     
     /**
      * Returns an (approximate) solution to the TSP problem via genetic 
