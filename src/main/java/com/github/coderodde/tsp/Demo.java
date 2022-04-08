@@ -3,6 +3,7 @@ package com.github.coderodde.tsp;
 import com.github.coderodde.tsp.TSPSolver.Solution;
 import com.github.coderodde.tsp.impl.BruteForceTSPSolver;
 import com.github.coderodde.tsp.impl.GeneticTSPSolverV1;
+import com.github.coderodde.tsp.impl.GeneticTSPSolverV2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,7 +13,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 
 public final class Demo extends Application {
@@ -34,7 +34,7 @@ public final class Demo extends Application {
         
         // solution1 - approximated.
         Solution solution1 = 
-                new GeneticTSPSolverV1(NUMBER_OF_GENERATIONS,
+                new GeneticTSPSolverV2(NUMBER_OF_GENERATIONS,
                                        POPULATION_SIZE)
                         .findTSPSolution(
                                 nodeList.get(0));
