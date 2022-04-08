@@ -80,7 +80,9 @@ public final class Demo extends Application {
         double[][] nodeCoordinates2 = 
                 getTourNodeCoordinates(solution2.getTour());
         
-        primaryStage.setTitle("GA4TSP - GA tour");
+        primaryStage.setTitle(
+                "GA4TSP - GA tour. Cost: " + (int) costApproximated);
+        
         Group root = new Group();
         Canvas canvas = new Canvas(300.0, 300.0);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -95,7 +97,7 @@ public final class Demo extends Application {
         primaryStage.show();
         
         Stage bfStage = new Stage();
-        bfStage.setTitle("GA4TSP - BF tour");
+        bfStage.setTitle("GA4TSP - BF tour. Cost: " + (int) costBruteForced);
         Group bfRoot = new Group();
         Canvas bfCanvas = new Canvas(300.0, 300.0);
         GraphicsContext bfGC = bfCanvas.getGraphicsContext2D();
@@ -131,7 +133,7 @@ public final class Demo extends Application {
             double x = nodeCoordinates[0][nodeIndex];
             double y = nodeCoordinates[1][nodeIndex];
             
-            gc.fillOval(x - 3.5, y - 3.5, 7.0, 7.0);
+            gc.fillOval(x - 5.0, y - 5.0, 10.0, 10.0);
         }
     }
     
