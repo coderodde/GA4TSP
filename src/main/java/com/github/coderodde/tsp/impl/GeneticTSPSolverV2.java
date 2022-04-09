@@ -69,6 +69,8 @@ public final class GeneticTSPSolverV2 implements TSPSolver {
     private final int numberOfGenerations;
     private final int populationSize;
     
+    private final Random random;
+    
     /**
      * Constructs a genetic solver with given parameters.
      * 
@@ -76,18 +78,22 @@ public final class GeneticTSPSolverV2 implements TSPSolver {
      * @param populationSize      the population size at each generation.
      */
     public GeneticTSPSolverV2(int numberOfGenerations,
-                              int populationSize) {
+                              int populationSize,
+                              Random random) {
         
         checkNumberOfGenerations(numberOfGenerations);
         checkPopulationSize(populationSize);
+        Objects.requireNonNull(random, "The input Random is null.");
         
         this.numberOfGenerations = numberOfGenerations;
         this.populationSize = populationSize;
+        this.random = random;
     }
     
     public GeneticTSPSolverV2() {
         this(DEFAULT_NUMBER_OF_GENERATIONS,
-             DEFAULT_POPULATION_SIZE);
+             DEFAULT_POPULATION_SIZE,
+             new Random());
     }
     
     /**
@@ -105,7 +111,6 @@ public final class GeneticTSPSolverV2 implements TSPSolver {
         
         checkGraphSize(reachableNodes.size());
         
-        Random random = new Random();
         AllPairsShortestPathData allPairsData = 
                 AllPairsShortestPathSolver.solve(reachableNodes);
         

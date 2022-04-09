@@ -4,6 +4,7 @@ import com.github.coderodde.tsp.TSPSolver.Solution;
 import com.github.coderodde.tsp.impl.BruteForceTSPSolver;
 import com.github.coderodde.tsp.impl.GeneticTSPSolverV1;
 import com.github.coderodde.tsp.impl.GeneticTSPSolverV2;
+import com.github.coderodde.tsp.impl.ParallelGeneticTSPSolver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -34,8 +35,11 @@ public final class Demo extends Application {
         
         // solution1 - approximated.
         Solution solution1 = 
-                new GeneticTSPSolverV2(NUMBER_OF_GENERATIONS,
-                                       POPULATION_SIZE)
+                new ParallelGeneticTSPSolver(
+                        new Random(),
+                        NUMBER_OF_GENERATIONS, 
+                        POPULATION_SIZE,
+                        4)
                         .findTSPSolution(
                                 nodeList.get(0));
         
