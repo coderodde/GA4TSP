@@ -70,6 +70,6 @@ public final class Node {
     
     @Override
     public String toString() {
-        return name;
+        return "[Node, name = " + name + "]";
     }
 }

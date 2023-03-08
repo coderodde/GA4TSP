@@ -1,9 +1,8 @@
 package com.github.coderodde.tsp;
 
 import com.github.coderodde.tsp.TSPSolver.Solution;
+import com.github.coderodde.tsp.impl.ApproximateTSPSolver;
 import com.github.coderodde.tsp.impl.BruteForceTSPSolver;
-import com.github.coderodde.tsp.impl.GeneticTSPSolverV1;
-import com.github.coderodde.tsp.impl.GeneticTSPSolverV2;
 import com.github.coderodde.tsp.impl.ParallelGeneticTSPSolver;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,63 +28,99 @@ public final class Demo extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        List<Node> nodeList = createNodeList(GRAPH_SIZE, NUMBER_OF_EDGES);
+        Random random = new Random();
+        
+        List<Node> nodeList = 
+                createNodeList(GRAPH_SIZE, 
+                               NUMBER_OF_EDGES,
+                               random);
         
         long startTime = System.currentTimeMillis();
         
         // solution1 - approximated.
-        Solution solution1 = 
+        Solution solutionGenetic = 
                 new ParallelGeneticTSPSolver(
-                        new Random(),
+                        random,
                         NUMBER_OF_GENERATIONS, 
                         POPULATION_SIZE,
-                        4)
+                        Runtime.getRuntime().availableProcessors())
                         .findTSPSolution(
                                 nodeList.get(0));
         
         long endTime = System.currentTimeMillis();
         System.out.println(
-                "GA duration: " + (endTime - startTime) + " ms.");
+                "GA duration         : " + (endTime - startTime) + " ms.");
         
         // solution2 - optimal.
         startTime = System.currentTimeMillis();
         
-        Solution solution2 = 
+        Solution solutionBruteForce = 
                 new BruteForceTSPSolver().findTSPSolution(nodeList.get(0));
         
         endTime = System.currentTimeMillis();
         System.out.println(
                 "Brute-force duration: " + (endTime - startTime) + " ms.");
         
-        System.out.println("---");
-        double costApproximated;
-        double costBruteForced;
+        startTime = System.currentTimeMillis();
+        
+        Solution solutionApproximate = 
+                new ApproximateTSPSolver()
+                        .findTSPSolution(nodeList.get(0));
+        
+        endTime = System.currentTimeMillis();
         
         System.out.println(
-                "GA cost: " 
-                        + (costApproximated = Utils.getTourCost(
-                                solution1.getTour(),
-                                solution1.getData())));
+                "Greedy duration:      " 
+                        + (endTime - startTime)
+                        + " ms.");
+        
+        System.out.println("---");
+        double costGenetic;
+        double costBruteForced;
+        double costApproximate;
+        
+        System.out.println(
+                "GA cost         : " 
+                        + (costGenetic = Utils.getTourCost(
+                                solutionGenetic.getTour(),
+                                solutionGenetic.getData())));
+        
+        System.out.println(
+                "Approximate cost: " 
+                        + (costApproximate = Utils.getTourCost(
+                                solutionApproximate.getTour(),
+                                solutionApproximate.getData())));
         
         System.out.println(
                 "Brute-force cost: " 
                         + (costBruteForced = Utils.getTourCost(
-                                solution2.getTour(),
-                                solution2.getData())));
+                                solutionBruteForce.getTour(),
+                                solutionBruteForce.getData())));
         
         System.out.println(
-                "Cost ratio: " + (costApproximated / costBruteForced));
+                "Cost ratio GA/BF: " + (costGenetic / costBruteForced));
         
-        // approximated.
+        System.out.println(
+                "Cost ratio Approx./BF: " 
+                        + (costApproximate / costBruteForced));
+        
+        // genetic:
         double[][] nodeCoordinates1 = 
-                getTourNodeCoordinates(solution1.getTour());
+                getTourNodeCoordinates(solutionGenetic.getTour());
         
-        // optimal.
+        // optimal:
         double[][] nodeCoordinates2 = 
-                getTourNodeCoordinates(solution2.getTour());
+                getTourNodeCoordinates(solutionBruteForce.getTour());
+        
+        // approximated:
+        double[][] nodeCoordinates3 = 
+                getTourNodeCoordinates(solutionApproximate.getTour());
+        
+        System.err.println(solutionApproximate.getTour());
+        System.err.println(solutionBruteForce.getTour());
         
         primaryStage.setTitle(
-                "GA4TSP - GA tour. Cost: " + (int) costApproximated);
+                "GA4TSP - GA tour. Cost: " + (int) costGenetic);
         
         Group root = new Group();
         Canvas canvas = new Canvas(300.0, 300.0);
@@ -111,6 +146,20 @@ public final class Demo extends Application {
         bfRoot.getChildren().add(bfCanvas);
         bfStage.setScene(new Scene(bfRoot));
         bfStage.show();
+        
+        Stage approxStage = new Stage();
+        approxStage.setTitle(
+                "GA4TSP - Approx. tour. Cost: " + (int) costApproximate);
+        
+        Group approxRoot = new Group();
+        Canvas approxCanvas = new Canvas(300.0, 300.0);
+        GraphicsContext approxGC = approxCanvas.getGraphicsContext2D();
+        approxGC.setLineWidth(4.0);
+        approxGC.setStroke(Color.DARKRED);
+        drawTour(approxGC, nodeCoordinates3);
+        approxRoot.getChildren().add(approxCanvas);
+        approxStage.setScene(new Scene(approxRoot));
+        approxStage.show();
     }
     
     private static void drawTour(GraphicsContext gc,
@@ -141,8 +190,9 @@ public final class Demo extends Application {
         }
     }
     
-    private static List<Node> createNodeList(int graphSize, int numberOfEdges) {
-        Random random = new Random();
+    private static List<Node> createNodeList(int graphSize,
+                                             int numberOfEdges,
+                                             Random random) {
         List<Node> nodeList = new ArrayList<>(graphSize);
         
         for (int i = 0; i < graphSize; ++i) {

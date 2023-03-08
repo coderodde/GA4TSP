@@ -78,7 +78,7 @@ public final class GeneticTSPSolverV1 implements TSPSolver {
         
         checkGraphSize(reachableNodes.size());
         
-        Random random = new Random();
+        Random random = new Random(1);
         AllPairsShortestPathData allPairsData = 
                 AllPairsShortestPathSolver.solve(reachableNodes);
         

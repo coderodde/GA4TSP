@@ -10,4 +10,25 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <exec.mainClass>com.github.coderodde.tsp.Demo</exec.mainClass>
     </properties>
+    <dependencies>
+        
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>18.0.2</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>18.0.2</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>18.0.2</version>
+            <classifier>win</classifier>
+        </dependency>
+    </dependencies>
 </project>
